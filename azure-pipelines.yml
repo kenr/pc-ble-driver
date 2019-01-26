@@ -1,6 +1,6 @@
 variables:
   nrf_ble_driver_build_type: Release
-  nrf_ble_driver_version: 4.1.0-alpha
+  nrf_ble_driver_version: 0.0.0
   nrf_ble_driver_install_prefix: artifacts/nrf-ble-driver-$(nrf_ble_driver_version)
 
 jobs:
