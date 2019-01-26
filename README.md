@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/kenandr0785/pc-ble-driver-attempt-1/_apis/build/status/kenr.pc-ble-driver)](https://dev.azure.com/kenandr0785/pc-ble-driver-attempt-1/_build/latest?definitionId=1)
+
 # pc-ble-driver
 
 `pc-ble-driver` provides C/C++ libraries for Bluetooth Low Energy nRF5 SoftDevice serialization.

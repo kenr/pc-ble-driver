@@ -1,0 +1,143 @@
+jobs:
+  - job: Ubuntu_16_04
+    pool:
+      vmImage: 'Ubuntu 16.04'
+    steps:
+    - script: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt-get update -y
+        sudo apt-get install g++-7 -y
+        sudo apt-get install libudev-dev -y
+        pushd .
+        cd ..
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        ls -laR
+        ./vcpkg install catch2
+        ./vcpkg install asio
+        popd
+      displayName: Setup vcpkg
+    - script: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+      displayName: Create project files
+    - script: |
+        cd build
+        cmake --build .
+      displayName: 'Compile'
+  - job: Windows_vs2017_x86
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install vcpkg.nuget
+      - script: |
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2
+      - script: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+          cmake --build .
+    displayName: 'VS2017-x32'
+  - job: Windows_vs2017_x64
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install vcpkg.nuget
+      - script: |
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio:x64-windows
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2:x64-windows
+      - script: |
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+          cmake --build .
+    displayName: 'VS2017-x64'
+  - job: Windows_vs2015_x86
+    pool:
+      vmImage: 'vs2015-win2012r2'
+    steps:
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install vcpkg.nuget
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install CMake-win64
+      - script: |
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2
+      - script: |
+          mkdir build
+          cd build
+          ..\cmake-win64.3.12.1\bin\cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+          cmake --build .
+    displayName: 'VS2015-x86'
+#  - job: Windows_vs2015_x64
+#    pool:
+#      vmImage: 'vs2015-win2012r2'
+#    steps:
+#      - task: NuGetCommand@2
+#        inputs:
+#            command: custom
+#            arguments: install vcpkg.nuget
+#      - task: NuGetCommand@2
+#        inputs:
+#            command: custom
+#            arguments: install CMake-win64
+#      - script: |
+#          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio:x64-windows
+#          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2:x64-windows
+#      - script: |
+#          pushd %CD%
+#          "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+#          popd
+#          mkdir build
+#          cd build
+#          ..\cmake-win64.3.12.1\bin\cmake "Visual Studio 14 2015 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake ..
+#      - task: MSBuild@1
+#        inputs:
+#          solution: '**/*.sln'
+#    displayName: 'VS2015-x64'
+  - job: macOS
+    pool:
+      vmImage: 'xcode9-macos10.13'
+    steps:
+    - script: |
+        brew install gcc6
+        pushd .
+        cd ..
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg install catch2
+        ./vcpkg install asio
+        popd
+      displayName: Setup vcpkg
+    - script: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+      displayName: Create project files
+    - script: |
+        cd build
+        echo "Starting compilation"
+        echo "ArtifactsStagingDirectory: $BUILD_ARTIFACTSTAGINGDIRECTORY"
+        cmake --build .
+        echo "Copying files in $PWD/Release to $BUILD_ARTIFACTSTAGINGDIRECTORY"
+        ls
+        cp -R artifacts "$BUILD_ARTIFACTSTAGINGDIRECTORY"
+      displayName: 'Compile'
+    - task: PublishPipelineArtifact@0
+      inputs:
+        artifactName: 'nrf-ble-driver-macos'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
