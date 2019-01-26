@@ -76,48 +76,43 @@ jobs:
         inputs:
             command: custom
             arguments: install vcpkg.nuget
-#      - task: NuGetCommand@2
-#        inputs:
-#            command: custom
-#            arguments: install CMake-win64
-      - script: |
-          choco install cmake
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install CMake-win64
       - script: |
           Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio
           Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2
       - script: |
           mkdir build
           cd build
-          #..\cmake-win64.3.12.1\bin\cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% ..
-          cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% ..
-          cmake --build . --target install
+          ..\cmake-win64.3.12.1\bin\cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% ..
+          ..\cmake-win64.3.12.1\bin\cmake --build . --target install
     displayName: 'VS2015-x86'
-#  - job: Windows_vs2015_x64
-#    pool:
-#      vmImage: 'vs2015-win2012r2'
-#    steps:
-#      - task: NuGetCommand@2
-#        inputs:
-#            command: custom
-#            arguments: install vcpkg.nuget
-#      - task: NuGetCommand@2
-#        inputs:
-#            command: custom
-#            arguments: install CMake-win64
-#      - script: |
-#          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio:x64-windows
-#          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2:x64-windows
-#      - script: |
-#          pushd %CD%
-#          "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
-#          popd
-#          mkdir build
-#          cd build
-#          ..\cmake-win64.3.12.1\bin\cmake "Visual Studio 14 2015 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake ..
-#      - task: MSBuild@1
-#        inputs:
-#          solution: '**/*.sln'
-#    displayName: 'VS2015-x64'
+  - job: Windows_vs2015_x64
+    pool:
+      vmImage: 'vs2015-win2012r2'
+    steps:
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install vcpkg.nuget
+      - task: NuGetCommand@2
+        inputs:
+            command: custom
+            arguments: install CMake-win64
+      - script: |
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install asio:x64-windows
+          Vcpkg.Nuget.1.5.0\vcpkg_bin\vcpkg install catch2:x64-windows
+      - script: |
+          pushd %CD%
+          "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+          popd
+          mkdir build
+          cd build
+          ..\cmake-win64.3.12.1\bin\cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% ..
+          ..\cmake-win64.3.12.1\bin\cmake --build . --target install
+    displayName: 'VS2015-x64'
   - job: macOS
     pool:
       vmImage: 'xcode9-macos10.13'
