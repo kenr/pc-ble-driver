@@ -1,11 +1,14 @@
+variables:
+  nrf_ble_driver_build_type: Release
+  nrf_ble_driver_version: 4.1.0-alpha
+  nrf_ble_driver_install_prefix: artifacts/nrf-ble-driver-$(nrf_ble_driver_version)
+
 jobs:
   - job: Ubuntu_16_04
     pool:
       vmImage: 'Ubuntu 16.04'
     variables:
-      build_type: Release
-      nrf_ble_driver_version: 4.1.0-alpha
-      nrf_ble_driver_install_prefix: artifacts/nrf-ble-driver-$(nrf_ble_driver_version)
+      VCPKG_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
     steps:
     - script: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -25,7 +28,8 @@ jobs:
     - script: |
         mkdir build
         cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=$NRF_BLE_DRIVER_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$NRF_BLE_DRIVER_INSTALL_PREFIX -DNRF_BLE_DRIVER_VERSION=$NRF_BLE_DRIVER_VERSION
+..
       displayName: Create project files
     - script: |
         cd build
@@ -45,7 +49,7 @@ jobs:
       - script: |
           mkdir build
           cd build
-          cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% ..
           cmake --build . --target install
     displayName: 'VS2017-x32'
   - job: Windows_vs2017_x64
@@ -62,7 +66,7 @@ jobs:
       - script: |
           mkdir build
           cd build
-          cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+          cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% ..
           cmake --build . --target install
     displayName: 'VS2017-x64'
   - job: Windows_vs2015_x86
@@ -83,7 +87,7 @@ jobs:
       - script: |
           mkdir build
           cd build
-          ..\cmake-win64.3.12.1\bin\cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+          ..\cmake-win64.3.12.1\bin\cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%NRF_BLE_DRIVER_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%NRF_BLE_DRIVER_INSTALL_PREFIX% -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION% ..
           cmake --build . --target install
     displayName: 'VS2015-x86'
 #  - job: Windows_vs2015_x64
@@ -130,16 +134,14 @@ jobs:
     - script: |
         mkdir build
         cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=$NRF_BLE_DRIVER_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$NRF_BLE_DRIVER_INSTALL_PREFIX -DNRF_BLE_DRIVER_VERSION=$NRF_BLE_DRIVER_VERSION ..
       displayName: Create project files
     - script: |
         cd build
-        echo "Starting compilation"
-        echo "ArtifactsStagingDirectory: $BUILD_ARTIFACTSTAGINGDIRECTORY"
         cmake --build . --target install
-        echo "Copying files in $PWD/Release to $BUILD_ARTIFACTSTAGINGDIRECTORY"
-        ls
-        cp -R artifacts "$BUILD_ARTIFACTSTAGINGDIRECTORY"
+        echo "Copying files in $NRF_BLE_DRIVER_INSTALL_PREFIX to $BUILD_ARTIFACTSTAGINGDIRECTORY"
+        ls -R $NRF_BLE_DRIVER_INSTALL_PREFIX
+        cp -R $NRF_BLE_DRIVER_INSTALL_PREFIX "$BUILD_ARTIFACTSTAGINGDIRECTORY"
       displayName: 'Compile'
     - task: PublishPipelineArtifact@0
       inputs:
