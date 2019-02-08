@@ -29,7 +29,7 @@ jobs:
       displayName: Create project files
     - script: |
         cd build
-        cmake --build . --target install
+        cmake --build . --target install -j 4
         cp -R artifacts "$BUILD_ARTIFACTSTAGINGDIRECTORY"
       displayName: 'Compile'
     - task: PublishPipelineArtifact@0
@@ -52,7 +52,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
-          cmake --build . --target install
+          cmake --build . --target install -j 4
           cmake -E copy_directory artifacts "%BUILD_ARTIFACTSTAGINGDIRECTORY%"
         displayName: 'VS2017-x32'
       - task: PublishPipelineArtifact@0
@@ -75,7 +75,7 @@ jobs:
           mkdir build
           cd build
           cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
-          cmake --build . --target install
+          cmake --build . --target install -j 4
           cmake -E copy_directory artifacts "%BUILD_ARTIFACTSTAGINGDIRECTORY%"
         displayName: 'VS2017-x64'
       - task: PublishPipelineArtifact@0
@@ -101,7 +101,7 @@ jobs:
           mkdir build
           cd build
           ..\cmake-win64.3.12.1\bin\cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
-          cmake --build . --target install
+          cmake --build . --target install -j 4
           cmake -E copy_directory artifacts "%BUILD_ARTIFACTSTAGINGDIRECTORY%"
         displayName: 'VS2015-x86'
       - task: PublishPipelineArtifact@0
@@ -159,7 +159,7 @@ jobs:
         cd build
         echo "Starting compilation"
         echo "ArtifactsStagingDirectory: $BUILD_ARTIFACTSTAGINGDIRECTORY"
-        cmake --build . --target install
+        cmake --build . --target install -j 4
         echo "Copying files in $PWD/Release to $BUILD_ARTIFACTSTAGINGDIRECTORY"
         cp -R artifacts "$BUILD_ARTIFACTSTAGINGDIRECTORY"
       displayName: 'Compile'
