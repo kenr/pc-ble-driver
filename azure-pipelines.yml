@@ -53,10 +53,10 @@ jobs:
           cmake -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
           cmake --build . --target install
         displayName: 'VS2017-x32'
-    - task: PublishPipelineArtifact@0
-      inputs:
-        artifactName: 'nrf-ble-driver-windows-x86'
-        targetPath: '$(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'nrf-ble-driver-windows-x86'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: Windows_vs2017_x64
     pool:
@@ -75,10 +75,10 @@ jobs:
           cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=..\Vcpkg.Nuget.1.5.0\vcpkg_bin\scripts\buildsystems\vcpkg.cmake -DCMAKE_INSTALL_PREFIX=artifacts/nrf-ble-driver ..
           cmake --build . --target install
         displayName: 'VS2017-x64'
-    - task: PublishPipelineArtifact@0
-      inputs:
-        artifactName: 'nrf-ble-driver-windows-x64'
-        targetPath: '$(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'nrf-ble-driver-windows-x64'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
   - job: Windows_vs2015_x86
     pool:
       vmImage: 'vs2015-win2012r2'
